@@ -1,6 +1,7 @@
+import  scala.annotation.tailrec
+
 // Caso de Uso: Módulo de Análisis de Inversiones – ECIBank
 // ECIBank requiere el diseño de un módulo central para analizar el comportamiento de inversiones financieras de forma confiable, predecible y segura. 
-//El objetivo es resolver distintos problemas reales del negocio bancario, aplicando principios de programación funcional como inmutabilidad, composición y manejo explícito del contexto.
 
 // Case Class para representar una inversion:
 case class InvestmentRecord(
@@ -36,6 +37,24 @@ val dataset: List[InvestmentRecord] = List(
   InvestmentRecord("INV-20", "Fondo_D",  "LOW",   BigDecimal(9000),  1.4, 2)
 )
 
+// Ejercicio 1 – Ganancia Total del Portafolio
+// Contexto: ECIBank necesita conocer cuánto dinero ganó o perdió un portafolio completo de inversiones durante un perido específico.
+// Objetivo: Calcular la ganancia monetaria total generada por todas las inversiones del portafolio, considerando tanto el capital invertido como su rendimiento.
+// Resultado: Un unico valor monetario que represente la ganancia o perdida total del portafolio.
+@tailrec
+def calcularGananciaTotal(inversiones: List[InvestmentRecord], acumulador: BigDecimal = BigDecimal(0)): BigDecimal = {
+    inversiones match {
+        case Nil => acumulador //Caso base cuando la lista esta vacia
+        case x::xs => // x es el primer elemento (una inversion) y xs es el resto de la lista de inversiones
+            val ganancia = x.investedAmount * BigDecimal(x.monthlyReturn / 100) //Calcular la ganancia: Ganancia = investedAmount × (monthlyReturn / 100)
+            calcularGananciaTotal(xs, acumulador + ganancia) //LLamada recursiva
+    }
+}
+
 @main def ejecutar(): Unit = {
-  println("Taller 3 - Programación Funcional")
+  println("Taller 3 - Programación Funcional\n")
+
+  println("Ejercicio 1 - Estructura y recursion:")
+  val gananciaTotalPortafolio = calcularGananciaTotal(dataset)
+  println(s"Ganancia total del portafolio: $$${gananciaTotalPortafolio}\n")
 }
