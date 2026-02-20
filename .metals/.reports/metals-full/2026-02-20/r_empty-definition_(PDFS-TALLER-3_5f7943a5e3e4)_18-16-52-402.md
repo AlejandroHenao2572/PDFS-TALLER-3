@@ -1,3 +1,14 @@
+error id: file:///C:/Users/aleja/OneDrive/Desktop/7%20SEMESTRE/PFSD/PrimerTercio/PDFS-TALLER-3/Main.scala:local8
+file:///C:/Users/aleja/OneDrive/Desktop/7%20SEMESTRE/PFSD/PrimerTercio/PDFS-TALLER-3/Main.scala
+empty definition using pc, found symbol in pc: 
+found definition using semanticdb; symbol local8
+empty definition using fallback
+non-local guesses:
+
+offset: 5715
+uri: file:///C:/Users/aleja/OneDrive/Desktop/7%20SEMESTRE/PFSD/PrimerTercio/PDFS-TALLER-3/Main.scala
+text:
+```scala
 import  scala.annotation.tailrec
 
 // Caso de Uso: Módulo de Análisis de Inversiones – ECIBank
@@ -34,17 +45,7 @@ val dataset: List[InvestmentRecord] = List(
   InvestmentRecord("INV-17", "BTC", "HIGH",  BigDecimal(7000), -0.5, 2),
   InvestmentRecord("INV-18", "BTC", "HIGH",  BigDecimal(7000),  3.2, 3),
   InvestmentRecord("INV-19", "Fondo_D",  "LOW",   BigDecimal(9000),  1.1, 1),
-  InvestmentRecord("INV-20", "Fondo_D",  "LOW",   BigDecimal(9000),  1.4, 2),
-  InvestmentRecord("INV-21", "Fondo_X", "LOW",    BigDecimal(0),     1.5, 1),      
-  InvestmentRecord("INV-22", "Accion_Y", "MEDIUM", BigDecimal(-5000), 2.0, 2),     
-  InvestmentRecord("INV-23", "Crypto_Z", "HIGH",  BigDecimal(10000), 15.5, 3),     
-  InvestmentRecord("INV-24", "Bono_W",   "LOW",   BigDecimal(8000),  -12.3, 1),    
-  InvestmentRecord("INV-25", "ETF_V",    "EXTREME", BigDecimal(6000), 2.5, 2),     
-  InvestmentRecord("INV-26", "Startup",  "VERY_HIGH", BigDecimal(3000), 5.0, 3), 
-  InvestmentRecord("INV-27", "Proyecto", "UNKNOWN", BigDecimal(0), 20.0, 1),       
-  InvestmentRecord("INV-28", "Fondo_K",  "SAFE",  BigDecimal(12000), -15.0, 2),    
-  InvestmentRecord("INV-29", "Derivado", "HIGH",  BigDecimal(-1000), 8.0, 3),      
-  InvestmentRecord("INV-30", "Hedge",    "MEDIUM", BigDecimal(5000),  25.7, 1)     
+  InvestmentRecord("INV-20", "Fondo_D",  "LOW",   BigDecimal(9000),  1.4, 2)
 )
 
 // Ejercicio 1 – Ganancia Total del Portafolio
@@ -116,16 +117,16 @@ def validarInversion(record: InvestmentRecord): ValidationResult[InvestmentRecor
 }
 
 //Paso 5: Mostrar resutado de analisis con pattern matching
-def mostrarResultadoAnalisis(record: InvestmentRecord): Unit = {
+def (record: InvestmentRecord): Unit = {
     validarInversion(record) match {
-        case Right(inv) => println(s"${inv.id} aprobada para analisis")
-        case Left(error) => println(s"Rechazada: $error")
+        case Right(inv) => println(s"${inv.id} aprobada para análisis")
+        case Left(@@error) => println(s"Rechazada: $error")
     } 
 }
 
 //Paso 6: Validar todo el dataset
 def validarPortafolio(inversiones: List[InvestmentRecord]): Unit = {
-  inversiones.map(inv => mostrarResultadoAnalisis(inv))
+  inversiones.map(inv => )
 }
 
 
@@ -135,8 +136,10 @@ def validarPortafolio(inversiones: List[InvestmentRecord]): Unit = {
   println("Ejercicio 1 - Estructura y recursion:")
   val gananciaTotalPortafolio = calcularGananciaTotal(dataset)
   println(s"Ganancia total del portafolio: $$${gananciaTotalPortafolio}\n")
-
-  println("Ejercicio 2 - Seguridad y contexto:")
-  print(validarPortafolio(dataset))
-
 }
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: 
