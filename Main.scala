@@ -1,7 +1,7 @@
 import  scala.annotation.tailrec
 import javax.print.DocFlavor.INPUT_STREAM
 
-// Caso de Uso: Módulo de Análisis de Inversiones – ECIBank
+// Caso de Uso: Modulo de Analisis de Inversiones – ECIBank
 // ECIBank requiere el diseño de un módulo central para analizar el comportamiento de inversiones financieras de forma confiable, predecible y segura. 
 
 // Case Class para representar una inversion:
@@ -217,6 +217,36 @@ def mostrarTendencias(tendencias: List[TrendAnalysis]): Unit = {
         println(s"  Ganancia: $$${t.gananciaInicial} -> $$${t.gananciaFinal} (${t.porcentajeCambio.formatted("%.2f")}%)\n")
     )
 }
+// Ejercicio 4 – Indicadores Financieros 
+// Contexto:
+// Para reportes ejecutivos, ECIBank necesita resumir el desempeño financiero de un conjunto de inversiones mediante indicadores claros y comparables.
+// Objetivo:
+// Obtener un resumen financiero que incluya
+// La mayor ganancia generada
+// La mayor perdida registrada
+// La ganancia total acumulada
+// Resultado Esperado
+// Un conjunto compacto de valores que describa el comportamiento financiero del portafolio.
+def calcularIndicadores(inversiones: List[InvestmentRecord]): (BigDecimal, BigDecimal, BigDecimal) = {
+  // Calcular todas las ganancias
+  val ganancias = inversiones.map(calcularGanancia)
+  
+  // Usar fold para el total y max/min para los extremos
+  val total = ganancias.foldLeft(BigDecimal(0))((acc, ganancia) => acc + ganancia)
+  
+  //Devolver la tupla con los tres indicadores
+  (ganancias.max, ganancias.min, total)
+}
+//Funcion para visualiasacion
+def mostrarIndicadores(indicadores: (BigDecimal, BigDecimal, BigDecimal)): Unit = {
+  val (maxGanancia, maxPerdida, total) = indicadores
+  
+  println(s"Indicadores Financieros")
+  println(s"Mayor ganancia:  $$${maxGanancia}")
+  println(s"Mayor perdida:   $$${maxPerdida}")
+  println(s"Ganancia total:  $$${total}")
+}
+
 
 @main def ejecutar(): Unit = {
     println("Taller 3 - Programación Funcional\n")
@@ -235,4 +265,8 @@ def mostrarTendencias(tendencias: List[TrendAnalysis]): Unit = {
     // Analizar tendencias un fondo
     val tendenciasFondoA = analizarTendenciasProducto("Fondo_A", dataset)
     mostrarTendencias(tendenciasFondoA)
+
+    println("\nEjercicio 4 - Agregación:")
+    val indicadores = calcularIndicadores(dataset)
+    mostrarIndicadores(indicadores)
 }
