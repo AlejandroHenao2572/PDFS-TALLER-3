@@ -6,7 +6,7 @@ import javax.print.DocFlavor.INPUT_STREAM
 
 // Case Class para representar una inversion:
 case class InvestmentRecord(
-  id: String, // identificador de la inversión
+  id: String, // identificador de la inversion
   product: String, // nombre del producto financiero
   riskLevel: String, // nivel de riesgo (LOW, MEDIUM, HIGH)
   investedAmount: BigDecimal,  // capital invertido
@@ -21,9 +21,9 @@ case class TrendAnalysis(
   mesFin: Int,
   gananciaInicial: BigDecimal,
   gananciaFinal: BigDecimal,
-  cambio: BigDecimal,           // Diferencia entre períodos
+  cambio: BigDecimal,           // Diferencia entre periodos
   porcentajeCambio: Double,     // Cambio porcentual
-  tendencia: String             // "INCREMENTO", "DISMINUCIÓN", "ESTABLE", "CAMBIO_BRUSCO"
+  tendencia: String             // "INCREMENTO", "DISMINUCION", "ESTABLE", "CAMBIO_BRUSCO"
 )
 
 // DataSet para pruebas:
@@ -247,6 +247,57 @@ def mostrarIndicadores(indicadores: (BigDecimal, BigDecimal, BigDecimal)): Unit 
   println(s"Ganancia total:  $$${total}")
 }
 
+// Ejercicio 5 – Organizacion del Capital por Nivel de Riesgo
+// Contexto:
+// El banco necesita visualizar como esta distribuido su capital segun el nivel de riesgo asumido
+// y poder gestionar dichas agrupaciones de manera flexible.
+// Objetivo:
+// Organizar las inversiones segun su nivel de riesgo
+// Resultado Esperado
+// El sistema debe permitir:
+// Consultar inversiones por riesgo
+// Agregar nuevas inversiones
+// Eliminar inversiones existentes
+// Verificar si un producto esta presente en un nivel de riesgo determinado
+
+//Paso 1: Organizar las inversiones por su nivel de riesgo
+def organizarPorRiesgo(inversiones: List[InvestmentRecord]): Map[String, List[InvestmentRecord]] = {
+  inversiones.groupBy(_.riskLevel) //Agrupar las inverciones por su nivel de riesgo
+}
+//Paso 2: Consultar inversiones por riego
+def consultarPorRiesgo(portafolio: Map[String, List[InvestmentRecord]], riesgo: String ): List[InvestmentRecord] = {
+  portafolio.getOrElse(riesgo, List.empty)
+}
+//Paso 3: Agregar una nueva inversion
+def agregarInversion(portafolio: Map[String, List[InvestmentRecord]], nuevaInversion: InvestmentRecord
+): Map[String, List[InvestmentRecord]] = {
+  
+  val riesgo = nuevaInversion.riskLevel
+  val inversionesActuales = portafolio.getOrElse(riesgo, List.empty)
+  val inversionesActualizadas = nuevaInversion :: inversionesActuales
+  
+  portafolio + ((riesgo, inversionesActualizadas))
+}
+//Paso 4: Eliminar una inversion
+def eliminarInversionDeRiesgo( portafolio: Map[String, List[InvestmentRecord]], 
+  riesgo: String,
+  inversionId: String
+): Map[String, List[InvestmentRecord]] = {
+  
+  val inversionesActuales = portafolio.getOrElse(riesgo, List.empty)
+  val inversionesActualizadas = inversionesActuales.filterNot(_.id == inversionId)
+  
+  portafolio + ((riesgo, inversionesActualizadas))
+}
+//Paso 5: Verificar si un producto existe
+def existeProductoEnRiesgo(portafolio: Map[String, List[InvestmentRecord]], 
+  producto: String, 
+  riesgo: String
+): Boolean = {
+  portafolio
+    .getOrElse(riesgo, List.empty)
+    .exists(_.product == producto)
+}
 
 @main def ejecutar(): Unit = {
     println("Taller 3 - Programación Funcional\n")
@@ -266,7 +317,26 @@ def mostrarIndicadores(indicadores: (BigDecimal, BigDecimal, BigDecimal)): Unit 
     val tendenciasFondoA = analizarTendenciasProducto("Fondo_A", dataset)
     mostrarTendencias(tendenciasFondoA)
 
-    println("\nEjercicio 4 - Agregación:")
+    println("\nEjercicio 4 - Agregacion:")
     val indicadores = calcularIndicadores(dataset)
     mostrarIndicadores(indicadores)
+
+    println("\nEjercicio 5 - Gestión y jerarquia:")
+
+    // Crear portafolio inicial
+    var portafolioRiesgo = organizarPorRiesgo(dataset)
+    //Consultar inversiones de riesgo HIGH
+    val inversionesAltas = consultarPorRiesgo(portafolioRiesgo, "HIGH")
+    println(s"Inversiones HIGH: ${inversionesAltas.size}")
+
+    //Agregar nueva inversión
+    val nuevaInv = InvestmentRecord("INV-31", "Bono_Z", "LOW", BigDecimal(20000), 0.5, 4)
+    portafolioRiesgo = agregarInversion(portafolioRiesgo, nuevaInv)
+
+    //Eliminar una inversión
+    portafolioRiesgo = eliminarInversionDeRiesgo(portafolioRiesgo, "LOW","INV-21")
+
+    // 4. Verificar si existe un producto
+    val existeBTC = existeProductoEnRiesgo(portafolioRiesgo, "BTC", "HIGH")
+    println(s"Existe BTC en HIGH?: $existeBTC")
 }
