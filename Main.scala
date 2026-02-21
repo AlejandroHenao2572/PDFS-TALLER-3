@@ -1,4 +1,5 @@
 import  scala.annotation.tailrec
+import javax.print.DocFlavor.INPUT_STREAM
 
 // Caso de Uso: Módulo de Análisis de Inversiones – ECIBank
 // ECIBank requiere el diseño de un módulo central para analizar el comportamiento de inversiones financieras de forma confiable, predecible y segura. 
@@ -11,6 +12,18 @@ case class InvestmentRecord(
   investedAmount: BigDecimal,  // capital invertido
   monthlyReturn: Double,       // porcentaje
   month: Int    // mes de la inversion (1-12)
+)
+
+// Case Class para representar una tendencia de inversion:
+case class TrendAnalysis(
+  product: String,
+  mesInicio: Int,
+  mesFin: Int,
+  gananciaInicial: BigDecimal,
+  gananciaFinal: BigDecimal,
+  cambio: BigDecimal,           // Diferencia entre períodos
+  porcentajeCambio: Double,     // Cambio porcentual
+  tendencia: String             // "INCREMENTO", "DISMINUCIÓN", "ESTABLE", "CAMBIO_BRUSCO"
 )
 
 // DataSet para pruebas:
@@ -61,7 +74,7 @@ def calcularGananciaTotal(inversiones: List[InvestmentRecord], acumulador: BigDe
     }
 }
 
-// Ejercicio 2 – Validacion de Inversiones antes del Analisis
+// Ejercicio 2 – Validacion de Inversiones
 // Contexto:
 // Antes de incluir una inversión en los reportes oficiales, el banco debe verificar que:
 // El monto invertido sea valido
@@ -128,15 +141,98 @@ def validarPortafolio(inversiones: List[InvestmentRecord]): Unit = {
   inversiones.map(inv => mostrarResultadoAnalisis(inv))
 }
 
+// Ejercicio 3 – Analisis de Tendencias de Ganancia
+// Contexto:
+// Los analistas financieros quieren identificar como evoluciona la ganancia real de un producto a lo largo del tiempo para detectar comportamientos positivos o señales de alerta.
+// Objetivo
+// Analizar la evolucion temporal de una inversion comparando periodos consecutivos y enfocandose en rangos especificos de tiempo.
+// Resultado Esperado:
+// Una estructura que permita identificar
+// Incrementos
+// Disminuciones
+// Cambios bruscos en la ganancia generada
+
+// Paso 1: Funcion para calcular la ganacia de una inversion
+def calcularGanancia(record: InvestmentRecord) :  BigDecimal = {
+    record.investedAmount * BigDecimal(record.monthlyReturn / 100)
+}
+
+//Paso 2: Funcion principal para analizar tendencias
+//Filtra inversiones del producto y ordena por mes
+//Usa sliding(2) para obtener pares consecutivos
+//Para cada par, calcula ganancias, cambio, porcentaje y clasifica
+//Retorna lista de TrendAnalysis
+def analizarTendenciasProducto(producto: String, inversiones: List[InvestmentRecord]) : List[TrendAnalysis] = {
+
+    // Filtrar por producto y ordernar por mes
+    val inversionesProducto = inversiones
+        .filter(_.product == producto)
+        .sortBy(_.month)
+
+    // Usar sliing para crear pares consecutivos de inversiones y analizarlas
+    inversionesProducto
+        .sliding(2)
+        .collect {
+            case List(inv1, inv2) =>
+                val gananciaInicial = calcularGanancia(inv1)
+                val gananciaFinal = calcularGanancia(inv2)
+                val cambio = gananciaFinal - gananciaInicial
+                
+                // Calcular cambio porcentual
+                val porcentajeCambio = if (gananciaInicial != 0) {
+                    (((gananciaFinal - gananciaInicial) / gananciaInicial) * 100).toDouble
+                } else {
+                0.0
+                }
+
+                // Clasificar tendencia
+                val tendencia = if (Math.abs(porcentajeCambio) > 50) {
+                "CAMBIO_BRUSCO"
+                } else if (porcentajeCambio > 10) {
+                "INCREMENTO"
+                } else if (porcentajeCambio < -10) {
+                "DISMINUCIÓN"
+                } else {
+                "ESTABLE"
+                }
+                
+                // Crear el analisis
+                TrendAnalysis(
+                product = producto,
+                mesInicio = inv1.month,
+                mesFin = inv2.month,
+                gananciaInicial = gananciaInicial,
+                gananciaFinal = gananciaFinal,
+                cambio = cambio,
+                porcentajeCambio = porcentajeCambio,
+                tendencia = tendencia
+                )
+        }
+        .toList
+}
+
+def mostrarTendencias(tendencias: List[TrendAnalysis]): Unit = {
+    tendencias.map(t => 
+        println(s"${t.product} [Mes ${t.mesInicio}->${t.mesFin}]: ${t.tendencia}")
+        println(s"  Ganancia: $$${t.gananciaInicial} -> $$${t.gananciaFinal} (${t.porcentajeCambio.formatted("%.2f")}%)\n")
+    )
+}
 
 @main def ejecutar(): Unit = {
-  println("Taller 3 - Programación Funcional\n")
+    println("Taller 3 - Programación Funcional\n")
 
-  println("Ejercicio 1 - Estructura y recursion:")
-  val gananciaTotalPortafolio = calcularGananciaTotal(dataset)
-  println(s"Ganancia total del portafolio: $$${gananciaTotalPortafolio}\n")
+    println("Ejercicio 1 - Estructura y recursion:")
+    val gananciaTotalPortafolio = calcularGananciaTotal(dataset)
+    println(s"Ganancia total del portafolio: $$${gananciaTotalPortafolio}\n")
 
-  println("Ejercicio 2 - Seguridad y contexto:")
-  print(validarPortafolio(dataset))
+    println("Ejercicio 2 - Seguridad y contexto:")
+    println(validarPortafolio(dataset))
 
+    println("Ejercicio 3 - Transformacion")
+    // Analizar tendencias de bitcoin
+    val tendeciasBTC = analizarTendenciasProducto("BTC", dataset)
+    mostrarTendencias(tendeciasBTC)
+    // Analizar tendencias un fondo
+    val tendenciasFondoA = analizarTendenciasProducto("Fondo_A", dataset)
+    mostrarTendencias(tendenciasFondoA)
 }
